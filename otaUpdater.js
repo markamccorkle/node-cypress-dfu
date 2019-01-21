@@ -36,10 +36,13 @@ var OTAUpdater = function (writeMethod) {
   updater.programRowStartPos = 0
   updater.arrayID = 1
 
+  function buf2hex(buffer) { // buffer is an ArrayBuffer
+    return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
+  }
+
   // Handle incoming data from higher level connection
   this.onData = function (data) {
-    data = new Buffer(data).toString('hex')
-    updater.doState(updater.currentState, data)
+    updater.doState(updater.currentState, buf2hex(data))
   }
 
   this.start = function (payload) {
