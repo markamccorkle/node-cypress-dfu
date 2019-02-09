@@ -299,7 +299,7 @@ var OTAUpdater = function (writeMethod) {
           updater.currentState = PROGRAM_ROW_RES
           otaWriter.OTAProgramRowCmd(rowMSB, rowLSB, modelData.arrayID, dataToSend, updater.payload.checkSumType, function(err){
             if(err){
-              handleError(err)
+              updater.handleError(err)
             }
           })
 
@@ -320,7 +320,7 @@ var OTAUpdater = function (writeMethod) {
           updater.currentState = PROGRAM_ROW_SEND_DATA_RES
           otaWriter.OTAProgramRowSendDataCmd(dataToSend, updater.payload.checkSumType, function(err){
             if(err){
-              handleError(err)
+              updater.handleError(err)
             }
           })
 
