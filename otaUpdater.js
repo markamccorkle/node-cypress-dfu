@@ -1,6 +1,5 @@
 var events = require('events')
 var util = require('util')
-var debug = require('debug')('cypressDFU:otaUpdater')
 var OTAUtil = require('./otaUtil.js')
 var BootLoaderCommands = require('./otaCommands.js')
 var OTAReader = require('./otaReader.js')
@@ -24,7 +23,7 @@ var EXIT_BOOTLOADER_REQ = 13
 var EXIT_BOOTLOADER_RES = 14
 var FINISHED = 15
 
-var OTAUpdater = function (writeMethod) {
+var OTAUpdater = function(writeMethod) {
   var otaWriter = new OTAWriter(writeMethod)
   var otaReader = new OTAReader()
 
@@ -41,29 +40,29 @@ var OTAUpdater = function (writeMethod) {
   }
 
   // Handle incoming data from higher level connection
-  this.onData = function (data) {
+  this.onData = function(data) {
     updater.doState(updater.currentState, buf2hex(data))
   }
 
-  this.start = function (payload) {
+  this.start = function(payload) {
     updater.payload = payload
     updater.doState(updater.currentState)
   }
 
-  this.doState = function (state, data) {
-    debug('Performing state: ' + state)
+  this.doState = function(state, data) {
+    console.log('Performing state: ' + state)
     switch (state) {
       case ENTER_BOOTLOADER_REQ:
         updater.emit('flashStart')
         updater.currentState = ENTER_BOOTLOADER_RES
-        otaWriter.OTAEnterBootLoaderCmd(updater.payload.checkSumType, function (err) {
+        otaWriter.OTAEnterBootLoaderCmd(updater.payload.checkSumType, function(err) {
           if (err) {
             updater.handleError(err)
           }
         })
         break
       case ENTER_BOOTLOADER_RES:
-        otaReader.parseEnterBootLoaderAcknowledgement(data, function (err, siliconID, siliconRev) {
+        otaReader.parseEnterBootLoaderAcknowledgement(data, function(err, siliconID, siliconRev) {
           if (err) {
             updater.handleError(err)
             return
@@ -86,15 +85,15 @@ var OTAUpdater = function (writeMethod) {
         break
       case GET_FLASH_SIZE_REQ:
         updater.currentState = GET_FLASH_SIZE_RES
-        debug('Requesting flash size for arrayID', updater.arrayID)
-        otaWriter.OTAGetFlashSizeCmd([updater.arrayID], updater.payload.checkSumType, 1, function (err) {
+        console.log('Requesting flash size for arrayID', updater.arrayID)
+        otaWriter.OTAGetFlashSizeCmd([updater.arrayID], updater.payload.checkSumType, 1, function(err) {
           if (err) {
             updater.handleError(err)
           }
         })
         break
       case GET_FLASH_SIZE_RES:
-        otaReader.parseGetFlashSizeAcknowledgement(data, function (err, startRow, endRow) {
+        otaReader.parseGetFlashSizeAcknowledgement(data, function(err, startRow, endRow) {
           if (err) {
             updater.handleError(err)
             return
@@ -102,7 +101,7 @@ var OTAUpdater = function (writeMethod) {
           updater.startRow = startRow
           updater.endRow = endRow
 
-          debug('Flash size received: startRow: ' + startRow + ' endRow: ' + endRow)
+          console.log('Flash size received: startRow: ' + startRow + ' endRow: ' + endRow)
 
           updater.currentState = PROGRAM_ROW_SEND_DATA_REQ
           updater.doState(updater.currentState)
@@ -113,7 +112,7 @@ var OTAUpdater = function (writeMethod) {
         writeProgrammableData(updater.programRowNumber)
         break
       case PROGRAM_ROW_SEND_DATA_RES:
-        otaReader.parseParseSendDataAcknowledgement(data, function (err, status) {
+        otaReader.parseParseSendDataAcknowledgement(data, function(err, status) {
           if (err) {
             updater.handleError(err)
             return
@@ -126,7 +125,7 @@ var OTAUpdater = function (writeMethod) {
         writeProgrammableData(updater.programRowNumber)
         break
       case PROGRAM_ROW_RES:
-        otaReader.parseParseRowAcknowledgement(data, function (err, status) {
+        otaReader.parseParseRowAcknowledgement(data, function(err, status) {
           if (err) {
             updater.handleError(err)
             return
@@ -143,14 +142,14 @@ var OTAUpdater = function (writeMethod) {
         var rowLSB = parseInt(rowString.substring(2, 4), 16)
 
         updater.currentState = VERIFY_ROW_RES
-        otaWriter.OTAVerifyRowCmd(rowMSB, rowLSB, modelData, updater.payload.checkSumType, function (err) {
+        otaWriter.OTAVerifyRowCmd(rowMSB, rowLSB, modelData, updater.payload.checkSumType, function(err) {
           if (err) {
             updater.handleError(err)
           }
         })
         break
       case VERIFY_ROW_RES:
-        otaReader.parseVerifyRowAcknowledgement(data, function (err, status, checksum) {
+        otaReader.parseVerifyRowAcknowledgement(data, function(err, status, checksum) {
           if (err) {
             updater.handleError(err)
             return
@@ -197,14 +196,14 @@ var OTAUpdater = function (writeMethod) {
         break
       case VERIFY_CHECKSUM_REQ:
         updater.currentState = VERIFY_CHECKSUM_RES
-        otaWriter.OTAVerifyCheckSumCmd(updater.payload.checkSumType, function (err) {
+        otaWriter.OTAVerifyCheckSumCmd(updater.payload.checkSumType, function(err) {
           if (err) {
             updater.handleError(err)
           }
         })
         break
       case VERIFY_CHECKSUM_RES:
-        otaReader.parseVerifyCheckSum(data, function (err, checkSumStatus) {
+        otaReader.parseVerifyCheckSum(data, function(err, checkSumStatus) {
           if (err) {
             updater.handleError(err)
             return
@@ -214,8 +213,10 @@ var OTAUpdater = function (writeMethod) {
         })
         break
       case EXIT_BOOTLOADER_REQ:
-        debug('EXIT_BOOTLOADER_REQ')
-        otaWriter.OTAExitBootloaderCmd(updater.payload.checkSumType, function (err) {
+        console.log('EXIT_BOOTLOADER_REQ')
+          // Moved this here for slower device that disconnect before getting the full read confirmation
+        updater.emit('flashFinished')
+        otaWriter.OTAExitBootloaderCmd(updater.payload.checkSumType, function(err) {
           if (err) {
             updater.handleError(err)
             return
@@ -225,8 +226,8 @@ var OTAUpdater = function (writeMethod) {
         })
         break
       case EXIT_BOOTLOADER_RES:
-        debug('EXIT_BOOTLOADER_RES')
-        otaReader.parseExitBootloader(data, function (err, response) {
+        console.log('EXIT_BOOTLOADER_RES')
+        otaReader.parseExitBootloader(data, function(err, response) {
           if (err) {
             updater.handleError(err)
             return
@@ -237,22 +238,23 @@ var OTAUpdater = function (writeMethod) {
         break
 
       case FINISHED:
-        debug('FINISHED')
         // Cleanup, emit final event
         updater.emit('flashFinished')
+        console.log('currentState: ' + currentState);
+        console.log('flashFinished called!');
         break
     }
   }
 
-  this.handleError = function (err) {
-    if (typeof (err) === 'number') {
+  this.handleError = function(err) {
+    if (typeof(err) === 'number') {
       var message = OTAErrors[err]
       updater.emit('error', new Error(message), message, err)
     }
     updater.emit('error', err)
   }
 
-  function checkProgramRowCommandToSend (totalSize) {
+  function checkProgramRowCommandToSend(totalSize) {
     if (totalSize <= BootLoaderCommands.MAX_DATA_SIZE) {
       return true
     } else {
@@ -260,19 +262,19 @@ var OTAUpdater = function (writeMethod) {
     }
   }
 
-  function progressUpdate (position) {
+  function progressUpdate(position) {
     var percentage = (position / (updater.payload.flashDataLines.length - 1)) * 100
     updater.emit('progress', Math.floor(percentage))
   }
 
-  function writeProgrammableData (rowPosition) {
-    debug('writeProgrammableData rowPosition: ', rowPosition)
+  function writeProgrammableData(rowPosition) {
+    console.log('writeProgrammableData rowPosition: ', rowPosition)
     progressUpdate(rowPosition)
     var startPosition = updater.programRowStartPos
     var modelData = updater.payload.flashDataLines[rowPosition]
     var mRowNo = OTAUtil.swap(parseInt(modelData.rowNumber.substring(0, 4), 16))
     if (modelData.arrayID !== updater.arrayID) {
-      debug('Current arrayID is incorrect. Requesting flash size again.')
+      console.log('Current arrayID is incorrect. Requesting flash size again.')
       updater.currentState = GET_FLASH_SIZE_REQ
       updater.doState(updater.currentState)
     } else {
@@ -297,8 +299,8 @@ var OTAUpdater = function (writeMethod) {
           }
 
           updater.currentState = PROGRAM_ROW_RES
-          otaWriter.OTAProgramRowCmd(rowMSB, rowLSB, modelData.arrayID, dataToSend, updater.payload.checkSumType, function(err){
-            if(err){
+          otaWriter.OTAProgramRowCmd(rowMSB, rowLSB, modelData.arrayID, dataToSend, updater.payload.checkSumType, function(err) {
+            if (err) {
               updater.handleError(err)
             }
           })
@@ -318,8 +320,8 @@ var OTAUpdater = function (writeMethod) {
           }
 
           updater.currentState = PROGRAM_ROW_SEND_DATA_RES
-          otaWriter.OTAProgramRowSendDataCmd(dataToSend, updater.payload.checkSumType, function(err){
-            if(err){
+          otaWriter.OTAProgramRowSendDataCmd(dataToSend, updater.payload.checkSumType, function(err) {
+            if (err) {
               updater.handleError(err)
             }
           })

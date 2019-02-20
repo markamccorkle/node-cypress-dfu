@@ -1,23 +1,46 @@
 {
-  "name": "cypress-dfu",
-  "version": "0.0.1",
+  "_from": "github:markamccorkle/node-cypress-dfu",
+  "_id": "cypress-dfu@0.0.1",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/cypress-dfu",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "cypress-dfu@github:markamccorkle/node-cypress-dfu",
+    "name": "cypress-dfu",
+    "escapedName": "cypress-dfu",
+    "rawSpec": "github:markamccorkle/node-cypress-dfu",
+    "saveSpec": "github:markamccorkle/node-cypress-dfu",
+    "fetchSpec": null,
+    "gitCommittish": null
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "github:markamccorkle/node-cypress-dfu#7e2267f54cc55d332050e82d653b37b4b4d018fe",
+  "_spec": "cypress-dfu@github:markamccorkle/node-cypress-dfu",
+  "_where": "/Volumes/1TBSSD/Repositories/ionic/ultra-legs",
+  "author": "",
+  "bundleDependencies": false,
+  "dependencies": {
+    "crc": "^3.8.0",
+    "underscore": "^1.9.1"
+  },
+  "deprecated": false,
   "description": "Library for performing DFU updates to Cypress BLE modules running the Cypress Bootloader",
+  "devDependencies": {
+    "cli-progress": "^2.1.1",
+    "noble-mac": "git://github.com/Timeular/noble-mac.git",
+    "noble-winrt": "git://github.com/Timeular/noble-winrt.git",
+    "select-shell": "^1.1.2",
+    "tape": "^4.9.2"
+  },
+  "license": "ISC",
   "main": "index.js",
+  "name": "cypress-dfu",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "crc": "^3.8.0",
-    "debug": "2.2.0",
-    "underscore": "^1.9.1"
-  },
-  "devDependencies": {
-    "tape": "^4.9.2",
-    "noble-mac": "git://github.com/Timeular/noble-mac.git",
-    "noble-winrt": "git://github.com/Timeular/noble-winrt.git",
-    "cli-progress": "^2.1.1",
-    "select-shell": "^1.1.2"
-  }
+  "version": "0.0.1"
 }

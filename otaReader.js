@@ -1,7 +1,6 @@
 var OTAUtil = require('./otaUtil.js')
-var debug = require('debug')('cypressDFU:otaReader')
 
-var OTAResponseReceiver = function () {
+var OTAResponseReceiver = function() {
   // Substring Constants
   var RESPONSE_START = 2
   var RESPONSE_END = 4
@@ -28,115 +27,115 @@ var OTAResponseReceiver = function () {
 
   var CASE_SUCCESS = 0
 
-  this.parseParseSendDataAcknowledgement = function (hexValue, callback) {
+  this.parseParseSendDataAcknowledgement = function(hexValue, callback) {
     var result = hexValue.trim().replace(' ', '')
     var response = result.substring(RESPONSE_START, RESPONSE_END)
     var status = result.substring(STATUS_START, STATUS_END)
     var responseBytes = parseInt(response, RADIX)
     switch (responseBytes) {
       case CASE_SUCCESS:
-        debug('CYRET_SUCCESS')
+        console.log('CYRET_SUCCESS')
         callback(null, status)
         break
       default:
-        debug('CYRET ERROR')
+        console.log('CYRET ERROR')
         callback(responseBytes)
         break
     }
   }
 
-  this.parseEnterBootLoaderAcknowledgement = function (parse, callback) {
+  this.parseEnterBootLoaderAcknowledgement = function(parse, callback) {
     var result = parse.trim().replace(' ', '')
     var response = result.substring(RESPONSE_START, RESPONSE_END)
-    debug('Response>>>>>' + result)
+    console.log('Response>>>>>' + result)
     var responseBytes = parseInt(response, RADIX)
     switch (responseBytes) {
       case CASE_SUCCESS:
-        debug('CYRET_SUCCESS')
+        console.log('CYRET_SUCCESS')
         var siliconID = result.substring(SILICON_ID_START, SILICON_ID_END).toUpperCase()
         var siliconRev = result.substring(SILICON_REV_START, SILICON_REV_END).toUpperCase()
         callback(null, siliconID, siliconRev)
         break
       default:
-        debug('CYRET ERROR')
+        console.log('CYRET ERROR')
         callback(responseBytes)
         break
     }
   }
 
-  this.parseGetFlashSizeAcknowledgement = function (parse, callback) {
+  this.parseGetFlashSizeAcknowledgement = function(parse, callback) {
     var result = parse.trim().replace(' ', '')
     var response = result.substring(RESPONSE_START, RESPONSE_END)
-    debug('Get flash size Response>>>>>' + result)
+    console.log('Get flash size Response>>>>>' + result)
     var responseBytes = parseInt(response, RADIX)
     switch (responseBytes) {
       case CASE_SUCCESS:
-        debug('CYRET_SUCCESS')
+        console.log('CYRET_SUCCESS')
         var startRow = OTAUtil.swap(parseInt(result.substring(START_ROW_START, START_ROW_END), RADIX))
         var endRow = OTAUtil.swap(parseInt(result.substring(END_ROW_START, END_ROW_END), RADIX))
         callback(null, startRow, endRow)
         break
       default:
-        debug('CYRET ERROR')
+        console.log('CYRET ERROR')
         callback(responseBytes)
         break
     }
   }
 
-  this.parseParseRowAcknowledgement = function (parse, callback) {
+  this.parseParseRowAcknowledgement = function(parse, callback) {
     var result = parse.trim().replace(' ', '')
     var response = result.substring(RESPONSE_START, RESPONSE_END)
     var status = result.substring(STATUS_START, STATUS_END)
     var responseBytes = parseInt(response, RADIX)
     switch (responseBytes) {
       case CASE_SUCCESS:
-        debug('CYRET_SUCCESS')
+        console.log('CYRET_SUCCESS')
         callback(null, status)
         break
       default:
-        debug('CYRET ERROR')
+        console.log('CYRET ERROR')
         callback(responseBytes)
         break
     }
   }
 
-  this.parseVerifyRowAcknowledgement = function (parse, callback) {
+  this.parseVerifyRowAcknowledgement = function(parse, callback) {
     var result = parse.trim().replace(' ', '')
     var response = result.substring(RESPONSE_START, RESPONSE_END)
     var data = result.substring(DATA_START, DATA_END)
     var responseBytes = parseInt(response, RADIX)
     switch (responseBytes) {
       case CASE_SUCCESS:
-        debug('CYRET_SUCCESS')
-        callback(null, response, data)// VERIFY_ROW_STATUS, VERIFY_ROW_CHECKSUM
+        console.log('CYRET_SUCCESS')
+        callback(null, response, data) // VERIFY_ROW_STATUS, VERIFY_ROW_CHECKSUM
         break
       default:
-        debug('CYRET ERROR')
+        console.log('CYRET ERROR')
         callback(responseBytes)
         break
     }
   }
 
-  this.parseVerifyCheckSum = function (parse, callback) {
+  this.parseVerifyCheckSum = function(parse, callback) {
     var result = parse.trim().replace(' ', '')
     var response = result.substring(RESPONSE_START, RESPONSE_END)
     var checkSumStatus = result.substring(CHECKSUM_START, CHECKSUM_END)
     var responseBytes = parseInt(response, RADIX)
     switch (responseBytes) {
       case CASE_SUCCESS:
-        debug('CYRET_SUCCESS')
+        console.log('CYRET_SUCCESS')
         callback(null, checkSumStatus)
         break
       default:
-        debug('CYRET ERROR')
+        console.log('CYRET ERROR')
         callback(responseBytes)
         break
     }
   }
 
-  this.parseExitBootloader = function (parse, callback) {
+  this.parseExitBootloader = function(parse, callback) {
     var response = parse.trim().replace(' ', '')
-    debug('Reponse Byte Exit>>' + response)
+    console.log('Reponse Byte Exit>>' + response)
     callback(null, response)
   }
 }
