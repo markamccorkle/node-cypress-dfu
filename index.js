@@ -3,7 +3,7 @@ var OTAUpdater = require('./otaUpdater.js')
 var events = require('events')
 var util = require('util')
 
-var CypressDFU = function () {
+function CypressDFU() {
   var cypressDFU = this
 
   this.startUpdate = function (payload, writeMethod) {
@@ -37,4 +37,4 @@ var CypressDFU = function () {
 }
 
 util.inherits(CypressDFU, events.EventEmitter)
-module.exports = new CypressDFU()
+module.exports = CypressDFU
