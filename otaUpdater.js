@@ -214,8 +214,6 @@ var OTAUpdater = function(writeMethod) {
         break
       case EXIT_BOOTLOADER_REQ:
         console.log('EXIT_BOOTLOADER_REQ')
-          // Moved this here for slower device that disconnect before getting the full read confirmation
-        updater.emit('flashFinished')
         otaWriter.OTAExitBootloaderCmd(updater.payload.checkSumType, function(err) {
           if (err) {
             updater.handleError(err)
@@ -223,6 +221,8 @@ var OTAUpdater = function(writeMethod) {
           }
           updater.currentState = FINISHED
           updater.doState(updater.currentState)
+          // Moved this here for slower device that disconnect before getting the full read confirmation
+          updater.emit('flashFinished')
         })
         break
       case EXIT_BOOTLOADER_RES:
