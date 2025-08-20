@@ -74,7 +74,7 @@ var OTAFirmwareWrite = function(writeMethod) {
     commandBytes[BYTE_CMD_DATA_SIZE_SHIFT] = (((data.length) >> ADDITIVE_OP))
 
     console.log('OTAProgramRowSendDataCmd', commandBytes)
-    debug(data)
+    console.log('Data:', data)
 
     for (var i = 1; i < data.length; i++) {
       commandBytes[i + 4] = data[i]

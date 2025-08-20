@@ -239,7 +239,7 @@ var OTAUpdater = function (writeMethod) {
 
       case FINISHED:
         // Cleanup, emit final event
-        console.log('currentState: ' + currentState);
+        console.log('currentState: ' + updater.currentState);
         console.log('flashFinished called!');
         updater.emit('flashFinished');
         break
@@ -310,7 +310,7 @@ var OTAUpdater = function (writeMethod) {
           var dataLength = BootLoaderCommands.MAX_DATA_SIZE
           var dataToSend = []
           for (var pos = 0; pos < dataLength; pos++) {
-            if (startPosition < modelData.dat.length) {
+            if (startPosition < modelData.data.length) {
               var data = modelData.data[startPosition]
               dataToSend[pos] = data
               startPosition++
